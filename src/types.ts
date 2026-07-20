@@ -93,6 +93,7 @@ export interface ScannedOrder {
   chaveAcesso: string;
   dataPedido: string | null;
   customer: string | null;
+  orderComments: string | null;
   itemCount: number;
   unitCount: number;
   volumeCount: number;

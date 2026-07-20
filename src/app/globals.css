@@ -2855,4 +2855,95 @@ body.compact .order-code .pid { font-size: 22px; }
   .operator-stat--bump,
   .operator-stat--bump .value,
   .operator-stat-bump { animation: none; }
+  .order-comments-bar { animation: none; }
+}
+
+/* ── Observação do pedido (OrderComments) ─────────────────────────────── */
+
+/* Barra pequena piscando, fixa logo abaixo do header (topbar tem 64px). */
+.order-comments-bar {
+  position: sticky;
+  top: 64px;
+  z-index: 19;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 6px 16px;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--warn) 55%, transparent);
+  background: color-mix(in srgb, var(--warn) 16%, var(--panel));
+  color: color-mix(in srgb, var(--warn) 72%, #000);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  animation: orderCommentsBlink 1.15s ease-in-out infinite;
+}
+
+.order-comments-bar:hover { filter: brightness(0.97); }
+.order-comments-bar:focus-visible { outline: 2px solid var(--warn); outline-offset: -2px; }
+
+.order-comments-bar__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: var(--warn);
+}
+
+.order-comments-bar__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@keyframes orderCommentsBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* Popup exibido ao bipar um pedido com observação. */
+.order-comments-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(17, 24, 28, 0.5);
+  animation: embKbScrimIn 0.2s ease-out;
+}
+
+.order-comments-modal {
+  width: 100%;
+  max-width: 440px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+}
+
+.order-comments-modal__head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: color-mix(in srgb, var(--warn) 72%, #000);
+}
+
+.order-comments-modal__head h2 {
+  margin: 0;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.order-comments-modal__body {
+  margin: 14px 0 20px;
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-break: break-word;
 }

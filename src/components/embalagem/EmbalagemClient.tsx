@@ -24,6 +24,7 @@ import { OrderLoading } from "./OrderLoading";
 import { OrderNotFound } from "./OrderNotFound";
 import { EmbalagemKeyboard } from "./EmbalagemKeyboard";
 import { PackSuccessOverlay } from "./PackSuccessOverlay";
+import { OrderCommentsAlert } from "./OrderCommentsAlert";
 
 // Duração do overlay de sucesso após fechar a embalagem.
 const PACK_SUCCESS_VISIBLE_MS = 1400;
@@ -55,6 +56,9 @@ export function EmbalagemClient() {
   // Teclado fica recolhido atrás de um botão flutuante (são muitas embalagens);
   // abre em tela cheia (abaixo do header) quando o operador quer escolher.
   const [keyboardOpen, setKeyboardOpen] = useState(false);
+  // Popup da observação do pedido (OrderComments da IDWorks). Abre ao bipar um
+  // pedido com observação; a barra piscante abaixo do header o reabre.
+  const [commentsOpen, setCommentsOpen] = useState(false);
   const [finalizing, setFinalizing] = useState(false);
   // Total de pedidos / itens embalados hoje pelo operador — atualizado a cada
   // novo bip de NF-e e quando a sessão monta. "0/0" enquanto a 1ª resposta
@@ -124,6 +128,7 @@ export function EmbalagemClient() {
       setBoxScanCount(0);
       setBoxScanCodes([]);
       setKeyboardOpen(false);
+      setCommentsOpen(false);
     }, 0);
   };
 
@@ -153,6 +158,7 @@ export function EmbalagemClient() {
         chaveAcesso,
       });
       setOrder(carregado);
+      setCommentsOpen(Boolean(carregado.orderComments));
       setOperatorStats(carregado.operatorStats);
       const initial: Record<string, number> = {};
       carregado.items.forEach((item) => {
@@ -342,6 +348,12 @@ export function EmbalagemClient() {
         operatorStats={operatorStats}
         onExit={handleExit}
         onReset={handleReset}
+      />
+      <OrderCommentsAlert
+        comments={order?.orderComments ?? null}
+        open={commentsOpen}
+        onOpen={() => setCommentsOpen(true)}
+        onClose={() => setCommentsOpen(false)}
       />
       <div
         className="stage"
