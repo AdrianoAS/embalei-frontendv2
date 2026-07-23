@@ -44,13 +44,15 @@ export function EmbalagemClient() {
   const [scanning, setScanning] = useState(false);
   const [scannedKey, setScannedKey] = useState<string | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
-  // Contagem de bipagens de caixa após o pedido abrir. Cada bip soma 1; a
-  // embalagem só é registrada quando o operador bipa a NF-e novamente (2º
-  // bipe da chave da nota). Não há finalização automática por contagem.
-  const [boxScanCount, setBoxScanCount] = useState(0);
-  // Códigos (EAN das embalagens) bipados em cada volume, na ordem de leitura.
-  // Enviados ao finalizar para o relatório de embalagens por operador.
+  // Códigos (EAN das embalagens) selecionados para o pedido, na ordem de leitura
+  // — cada toque adiciona um; o lápis define a quantidade exata. Enviados ao
+  // finalizar para o relatório de embalagens por operador. Não há limite por
+  // volume esperado nem finalização automática — a finalização é explícita pelo
+  // botão "Confirmar volumes", que exige ao menos uma embalagem.
   const [boxScanCodes, setBoxScanCodes] = useState<string[]>([]);
+  // Quantidade total de embalagens — sempre derivada dos códigos, para nunca
+  // dessincronizar (não é estado próprio).
+  const boxScanCount = boxScanCodes.length;
   // Catálogo de embalagens para o teclado virtual de contagem de volumes.
   const [embalagens, setEmbalagens] = useState<ApiEmbalagem[]>([]);
   // Teclado fica recolhido atrás de um botão flutuante (são muitas embalagens);
@@ -125,7 +127,6 @@ export function EmbalagemClient() {
     setTimeout(() => {
       setOrder(null);
       setPicks({});
-      setBoxScanCount(0);
       setBoxScanCodes([]);
       setKeyboardOpen(false);
       setCommentsOpen(false);
@@ -149,7 +150,6 @@ export function EmbalagemClient() {
     setScannedKey(chaveAcesso);
     setScanError(null);
     setScanning(true);
-    setBoxScanCount(0);
     setBoxScanCodes([]);
     setKeyboardOpen(false);
     try {
@@ -180,7 +180,7 @@ export function EmbalagemClient() {
         );
       } else {
         pushToast(
-          `Pedido ${carregado.numPedido} aberto · bipe ${carregado.volumeCount} volume(s) e a NF-e para finalizar`,
+          `Pedido ${carregado.numPedido} aberto · selecione as embalagens e toque em "Confirmar volumes"`,
           "success"
         );
       }
@@ -199,6 +199,14 @@ export function EmbalagemClient() {
     if (!session || !order || finalizing) return;
     if (order.alreadyPacked || !order.session.isMine) {
       pushToast("Sessão não está aberta neste operador.", "error");
+      return;
+    }
+
+    if (boxScanCount < 1) {
+      pushToast(
+        "Selecione ao menos uma embalagem utilizada antes de finalizar o pedido.",
+        "error"
+      );
       return;
     }
     setFinalizing(true);
@@ -248,9 +256,11 @@ export function EmbalagemClient() {
       return;
     }
     if (isChaveAcesso(code)) {
-      // 2º bipe da MESMA NF-e: finaliza a sessão aberta.
+      // 2º bipe da MESMA NF-e: NÃO finaliza mais (evita finalização acidental
+      // por duplo bip). A finalização passa a ser explícita pelo botão
+      // "Confirmar volumes", que valida os campos obrigatórios.
       if (order && code === order.chaveAcesso) {
-        void finalizar();
+        pushToast("Pedido já carregado · use o botão para finalizar.", "warn");
         return;
       }
       // Bipou uma NF-e diferente com sessão aberta: bloqueia (operador precisa
@@ -279,15 +289,6 @@ export function EmbalagemClient() {
   const addEmbalagem = (code: string) => {
     if (!order || finalizing) return;
     if (order.alreadyPacked || !order.session.isMine) return;
-    const expected = Math.max(order.volumeCount, 1);
-    if (boxScanCount >= expected) {
-      pushToast(
-        `Limite de ${expected} volume(s) atingido · confirme os volumes`,
-        "warn"
-      );
-      return;
-    }
-    setBoxScanCount(boxScanCount + 1);
     setBoxScanCodes((codes) => [...codes, code]);
   };
 
@@ -299,7 +300,26 @@ export function EmbalagemClient() {
     const next = boxScanCodes.slice();
     next.splice(index, 1);
     setBoxScanCodes(next);
-    setBoxScanCount(next.length);
+  };
+
+  const setEmbalagemQuantity = (code: string, quantity: number) => {
+    if (finalizing) return;
+    const clamped = Math.max(0, Math.floor(quantity));
+    let kept = 0;
+    const next: string[] = [];
+    for (const current of boxScanCodes) {
+      if (current !== code) {
+        next.push(current);
+      } else if (kept < clamped) {
+        next.push(current);
+        kept += 1;
+      }
+    }
+    while (kept < clamped) {
+      next.push(code);
+      kept += 1;
+    }
+    setBoxScanCodes(next);
   };
 
   const handlePickItem = (idSku: string) => {
@@ -333,8 +353,8 @@ export function EmbalagemClient() {
 
   const showKeyboard =
     !!order && order.session.isMine && !order.alreadyPacked && !finalizing;
-  const expectedVolumes = order ? Math.max(order.volumeCount, 1) : 1;
-  const volumesComplete = boxScanCount >= expectedVolumes;
+  // Campo obrigatório para finalizar: ao menos uma embalagem selecionada.
+  const hasEmbalagem = boxScanCount >= 1;
   // Quando aberto, o modal cobre a tela (não precisa reservar). Quando fechado,
   // reserva espaço para o botão flutuante não cobrir o fim do conteúdo.
   const stagePaddingBottom = showKeyboard && !keyboardOpen ? 96 : undefined;
@@ -390,10 +410,10 @@ export function EmbalagemClient() {
             embalagens={embalagens}
             codes={boxScanCodes}
             total={boxScanCount}
-            expected={expectedVolumes}
             finalizing={finalizing}
             onAdd={addEmbalagem}
             onRemove={removeEmbalagem}
+            onSetQuantity={setEmbalagemQuantity}
             onConfirm={finalizar}
             onClose={() => setKeyboardOpen(false)}
           />
@@ -402,27 +422,23 @@ export function EmbalagemClient() {
 
       {showKeyboard && !keyboardOpen && (
         <div className="emb-fab-bar">
-          {volumesComplete && (
-            <button
-              type="button"
-              className="btn primary emb-fab-confirm"
-              onClick={finalizar}
-              disabled={finalizing}
-            >
-              <Icon.check width={16} height={16} />
-              Confirmar volumes
-            </button>
-          )}
           <button
             type="button"
-            className={"emb-fab" + (volumesComplete ? " emb-fab--complete" : "")}
+            className="btn primary emb-fab-confirm"
+            onClick={finalizar}
+            disabled={finalizing}
+          >
+            <Icon.check width={16} height={16} />
+            Confirmar volumes
+          </button>
+          <button
+            type="button"
+            className={"emb-fab" + (hasEmbalagem ? " emb-fab--complete" : "")}
             onClick={() => setKeyboardOpen(true)}
             aria-label="Abrir teclado de embalagens"
           >
             <Icon.box width={24} height={24} />
-            <span className="emb-fab-badge">
-              {boxScanCount}/{expectedVolumes}
-            </span>
+            <span className="emb-fab-badge">{boxScanCount}</span>
           </button>
         </div>
       )}
