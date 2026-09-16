@@ -66,6 +66,15 @@ while read -r local_ref local_sha remote_ref remote_sha; do
     continue
   fi
 
+  # O push so consegue referenciar um objeto que exista LOCALMENTE. Num clone que
+  # ainda nao buscou o upstream, o sha lido pelo ls-remote nao esta aqui e o push
+  # morre com "fatal: bad object <sha>" — foi o que aconteceu em 6 dos 9 repos na
+  # primeira execucao real deste hook. O fetch e best-effort: se falhar, o push
+  # abaixo falha e o aviso sai, sem bloquear o push para o fork.
+  git cat-file -e "${base_sha}^{commit}" 2>/dev/null \
+    || git fetch --quiet upstream "$BASE_BRANCH" 2>/dev/null \
+    || true
+
   # `-c core.hooksPath=/dev/null` evita que este mesmo hook rode de novo.
   if git -c core.hooksPath=/dev/null push -q upstream \
       "$base_sha:refs/heads/$branch" 2>/dev/null; then
