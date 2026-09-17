@@ -30,9 +30,9 @@ Tom: direto, de gente que trabalha na estação. Nada de jargão de código na n
 > original do usuário verbatim. O que está aqui é a forma operacional dele. **Leia os dois
 > antes de escrever qualquer roteiro** — quando divergirem, o `PROMPT-ROTEIRO.md` manda.
 
-Quem narra é o **Fausto** — voz clonada, personagem fixo de todos os vídeos de novidade, e
-presença em tela (poses em `assets/`). Gente da casa que fala pelo rádio, não locutor de
-comercial.
+Quem narra é o **Fausto** — voz clonada, personagem fixo de todos os vídeos de novidade. Gente
+da casa que fala pelo rádio, não locutor de comercial. **Por ora ele é só voz e não aparece em
+tela**; ver [Assets](#assets).
 
 ### A regra que manda em todas as outras
 
@@ -107,8 +107,8 @@ inferência e não fato da PR, registre em `Notes` do `STORYBOARD.md`.
 **Onde o personagem não entra:**
 
 - **Na explicação do meio.** Ali a pessoa está aprendendo a operar a tela; bordão no meio de
-  "bipe a NF-e para finalizar" atrapalha o que ela veio aprender. Ele aparece em
-  tela o vídeo inteiro, mas a *voz* dele vira só narração ali.
+  "bipe a NF-e para finalizar" atrapalha o que ela veio aprender. A *voz* dele vira só narração
+  ali.
 - **Dentro do crédito.** O crédito é de gente real, dito com o nome real, e vem *antes* do
   bordão de fecho — nunca dissolvido nele. O Fausto apresenta o trabalho; não o assina.
 - **Gíria de rádio que a operação não decodifica** (QAP, câmbio, código Q). O registro é o
@@ -116,11 +116,15 @@ inferência e não fato da PR, registre em `Notes` do `STORYBOARD.md`.
 
 ## Assets
 
-**O Fausto em tela.** As quatro poses oficiais estão versionadas em
-[`personagem/`](./personagem/) — `acena` (apresentação), `radio` (virada), `apresenta`
-(neutro, os frames do meio) e `polegar` (fecho). Copie para `assets/` do projeto **depois** do
-`hyperframes init`, e leia o [`personagem/README.md`](./personagem/README.md) antes de desenhar
-a geometria: ele come 431px de largura e o palco tem de nascer já reservando essa coluna.
+**O Fausto NÃO entra em tela.** Decisão de 17/09/2026: o vídeo é narração sobre as telas
+desenhadas, sem o personagem no quadro. Na prática isso quer dizer três coisas: não copie
+nenhuma pose para `assets/`, não reserve coluna nenhuma no palco — o canvas inteiro é conteúdo —
+e nenhum frame ganha camada de personagem.
+
+As quatro poses continuam versionadas em [`personagem/`](./personagem/) de propósito, para
+quando a presença em tela for pedida de volta. A marcação, a geometria e o custo de palco estão
+em [`personagem/README.md`](./personagem/README.md), que enquanto esta decisão valer é
+**referência futura, não instrução de execução**.
 
 Fora isso, nenhum material do usuário. Sem prints das telas reais — as telas são desenhadas em HTML a
 partir do código deste repositório, então ficam parecidas com o produto, não idênticas.

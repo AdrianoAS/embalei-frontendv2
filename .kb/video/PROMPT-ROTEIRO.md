@@ -11,6 +11,15 @@ divergirem, este aqui manda: o `BRIEF.template.md` é a destilação, este é a 
 Registrado em 16/09/2026, depois do vídeo da PR #86, cujo primeiro roteiro foi reprovado
 justamente por soar como documentação lida em voz alta.
 
+> **Emenda de 17/09/2026 — o Fausto é só voz.** O personagem **não aparece em tela**: o vídeo é
+> a narração dele sobre as telas desenhadas. Tudo o que este arquivo diz sobre a persona, os
+> bordões e o jeito de falar continua valendo integralmente; só a presença no quadro saiu.
+>
+> Isto não contradiz o pedido abaixo, que fala em "fará a narração em áudio enquanto são
+> exibidas imagens, vídeos e demonstrações" — a presença em tela foi uma decisão posterior, de
+> 16/09/2026, e agora foi revertida. As poses seguem versionadas em
+> [`personagem/`](./personagem/) para quando forem pedidas de volta.
+
 ---
 
 ## O pedido, como foi escrito

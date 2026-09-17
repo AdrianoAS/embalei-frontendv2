@@ -1,9 +1,17 @@
-# Fausto — personagem em tela
+# Fausto em tela — DESLIGADO por ora
 
-As quatro poses oficiais do Fausto, avatar interno da empresa. Ele **não é só voz**: aparece em
-tela nos vídeos de novidade, em todos os frames.
+> **Decisão de 17/09/2026: o Fausto não aparece em tela.** Os vídeos de novidade passam a ser
+> narração sobre as telas desenhadas — a voz dele continua igual, a presença no quadro não.
+> **Nada deste arquivo deve ser executado hoje.**
+>
+> As quatro poses seguem versionadas aqui de propósito, para quando o personagem em tela for
+> pedido de volta. O resto do documento é o passo a passo dessa reativação: marcação, geometria,
+> custo de palco e regras de lado.
 
-Copie estes arquivos para `assets/` do projeto HyperFrames logo depois do `hyperframes init`
+As quatro poses oficiais do Fausto, avatar interno da empresa.
+
+Quando a presença em tela voltar, copie estes arquivos para `assets/` do projeto HyperFrames
+logo depois do `hyperframes init`
 (o init recusa diretório não vazio, então nunca antes). A recipe `embalei-novidade` não os
 leva junto — `recipe.mjs use` só copia o `frame.md`.
 
@@ -75,8 +83,11 @@ Consequências medidas na PR #86, onde o palco teve de ser refeito duas vezes:
 - **Nunca troca de lado num corte casado.** Se dois frames compartilham o enquadramento na
   emenda, ele fica do mesmo lado nos dois — senão o personagem teleporta.
 
-## Divergência conhecida com o `BRIEF.template.md`
+## Histórico da decisão
 
-O template diz que o personagem não entra nos frames do meio nem no crédito. Isso vale para a
-**voz** (os bordões), não para a **presença em tela** — em tela ele aparece em todos os sete
-frames, por decisão do usuário em 16/09/2026.
+Em 16/09/2026 o personagem aparecia em tela em todos os frames, e o `BRIEF.template.md` divergia
+disso: o que ele restringe — frames do meio e crédito — sempre valeu para a **voz**, nunca para
+a presença no quadro.
+
+Em 17/09/2026 a presença em tela foi **desligada**, a pedido do usuário. Hoje o BRIEF e este
+arquivo não divergem mais: o Fausto é só voz, e a marcação acima é o caminho de volta.
